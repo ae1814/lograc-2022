@@ -63,7 +63,10 @@ data Bool : Set where
 -}
 
 _⊕_ : Bool → Bool → Bool
-b ⊕ b' = {!!}
+true ⊕ true = false
+true ⊕ false = true
+false ⊕ true = true
+false ⊕ false = false
 
 {-
    You can test whether your definition computes correctly by using
@@ -95,7 +98,7 @@ data ℕ : Set where
 -}
 
 incr : ℕ → ℕ
-incr n = {!!}
+incr n = suc n
 
 {-
    Define a function that decrements a number by one. Give the definition
@@ -103,7 +106,8 @@ incr n = {!!}
 -}
 
 decr : ℕ → ℕ
-decr n = {!!}
+decr zero = zero
+decr (suc n) = n
 
 {-
    Define a function that triples the value of a given number.
@@ -111,7 +115,8 @@ decr n = {!!}
 -}
 
 triple : ℕ → ℕ
-triple n = {!!}
+triple zero = zero
+triple (suc n) = suc (suc (suc (triple n)))  -- 3 * ( n  + 1) = 3 * n + 3
 
 
 ----------------
@@ -142,7 +147,8 @@ infixl 7  _*_
 -}
 
 _^_ : ℕ → ℕ → ℕ
-m ^ n = {!!}
+m ^ zero = 1
+m ^ suc n = m * (m ^ n) -- m**(n+1) = m*m**n
 
 infixl 8  _^_
 
@@ -178,7 +184,9 @@ infixl 20 _I
 -}
 
 b-incr : Bin → Bin
-b-incr b = {!!}
+b-incr ⟨⟩ = ⟨⟩  I
+b-incr (b O) = b I
+b-incr (b I) = (b-incr b) O
 
 
 ----------------
@@ -195,11 +203,18 @@ b-incr b = {!!}
 -}
 
 to : ℕ → Bin
-to n = {!!}
+to zero = ⟨⟩ O
+to (suc n) = b-incr (to n)
 
 from : Bin → ℕ
-from b = {!!}
+from b = from-aux b 0
 
+   where 
+
+      from-aux : Bin -> ℕ -> ℕ
+      from-aux ⟨⟩ n = 0 
+      from-aux (b O) n = from-aux b (suc n)
+      from-aux (b I) n = from-aux b (suc n) + 2 ^ n
 
 ----------------
 -- Exercise 6 --
@@ -218,8 +233,7 @@ data Even : ℕ → Set where
 -}
 
 data Even₂ : Bin → Set where
-  {- EXERCISE: add the constructors for this inductive predicate here -}
-
+   even₂ : {b : Bin} -> Even₂ (b O)
 
 ----------------
 -- Exercise 7 --
@@ -231,7 +245,12 @@ data Even₂ : Bin → Set where
 -}
 
 to-even : {n : ℕ} → Even n → Even₂ (to n)
-to-even p = {!!}
+to-even  even-z = even₂ -- p= even-z, p : Even n, zero-z : Even zero ==> n = zeros
+to-even (even-ss p) = to-even-aux (to-even p)
+
+   where 
+      to-even-aux : {b : Bin } -> Even₂ b -> Even₂ (b-incr (b-incr b))
+      to-even-aux even₂ = even₂
 
 
 ----------------
