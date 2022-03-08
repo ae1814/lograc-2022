@@ -271,8 +271,8 @@ to-even (even-ss p) = to-even-aux (to-even p)
 -}
 
 data NonEmptyBin : Bin → Set where
-  {- EXERCISE: add the constructors for this inductive predicate here -}
-
+   neO : {b : Bin} → NonEmptyBin (b O)
+   neI : {b : Bin} → NonEmptyBin (b I)
 {-
    To verify that `NonEmptyBin ⟨⟩` is indeed not inhabited as intended,
    show that you can define a function from it to Agda's empty type
@@ -282,7 +282,7 @@ data NonEmptyBin : Bin → Set where
 data ⊥ : Set where
 
 ⟨⟩-empty : NonEmptyBin ⟨⟩ → ⊥
-⟨⟩-empty p = {!!}
+⟨⟩-empty ()
 
 
 ----------------
@@ -299,7 +299,12 @@ data ⊥ : Set where
 -}
 
 from-ne : (b : Bin) → NonEmptyBin b → ℕ
-from-ne b p = {!!}
+from-ne (⟨⟩ O) neO = zero
+from-ne (b O O) neO = 2 * (from-ne (b O) neO)
+from-ne (b I O) neO = 2 * (from-ne (b I) neI)
+from-ne (⟨⟩ I) neI = 1
+from-ne (b O I) neI = 1 + 2 * (from-ne (b O) neO)
+from-ne (b I I) neI = 1 +  2 * (from-ne (b I) neI)
 
 
 -----------------
@@ -332,7 +337,8 @@ infixr 5 _∷_
 -}
 
 map : {A B : Set} → (A → B) → List A → List B
-map f xs = {!!}
+map f [] = []
+map f (x ∷ xs) = f x ∷ map f xs
 
 
 -----------------
@@ -344,7 +350,8 @@ map f xs = {!!}
 -}
 
 length : {A : Set} → List A → ℕ
-length xs = {!!}
+length [] = 0
+length (x ∷ xs) = 1 + length xs
 
 -----------------
 -- Exercise 12 --
@@ -365,7 +372,8 @@ data _≡ᴺ_ : ℕ → ℕ → Set where
 -}
 
 map-≡ᴺ : {A B : Set} {f : A → B} → (xs : List A) → length xs ≡ᴺ length (map f xs)
-map-≡ᴺ xs = {!!}
+map-≡ᴺ [] = z≡ᴺz
+map-≡ᴺ (x ∷ xs) = s≡ᴺs (map-≡ᴺ xs)
 
 
 -----------------
@@ -389,6 +397,8 @@ infix 4 _≤_
 -}
 
 data _≤ᴸ_ {A : Set} : List A → List A → Set where
+   []≤ᴸxs : {xs : List A} → [] ≤ᴸ xs
+   ∷≤ᴸ∷ : {x y : A} → {xs ys : List A} → xs ≤ᴸ ys → x ∷ xs ≤ᴸ y ∷ ys 
   {- EXERCISE: add the constructors for this inductive relation here -}
 
 infix 4 _≤ᴸ_
@@ -404,10 +414,12 @@ infix 4 _≤ᴸ_
 -}
 
 length-≤ᴸ-≦ : {A : Set} {xs ys : List A} → xs ≤ᴸ ys → length xs ≤ length ys
-length-≤ᴸ-≦ p = {!!}
+length-≤ᴸ-≦ []≤ᴸxs = z≤n
+length-≤ᴸ-≦ (∷≤ᴸ∷ p) = s≤s  (length-≤ᴸ-≦ p)
 
 length-≤-≦ᴸ : {A : Set} (xs ys : List A) → length xs ≤ length ys → xs ≤ᴸ ys
-length-≤-≦ᴸ xs ys p = {!!}
+length-≤-≦ᴸ [] ys z≤n = []≤ᴸxs
+length-≤-≦ᴸ (x ∷ xs) (x₁ ∷ ys) (s≤s p) = ∷≤ᴸ∷  (length-≤-≦ᴸ xs ys p)
 
 
 -----------------
